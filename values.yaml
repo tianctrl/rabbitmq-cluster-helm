@@ -1,0 +1,27 @@
+replicas: 3
+
+## RabbitMQ Cluster image
+##
+image:
+  name: neunnsy/rabbitmq-cluster
+  pullPolicy: IfNotPresent
+
+serviceAccount: true
+serviceAccountName: rabbitmq
+
+## Node port
+##
+rabbitmqNodePort: 5672
+
+## RabbitMQ Manager port
+##
+rabbitmqManagerPort: 15672
+
+## longName: true
+## autoClusterType: k8s
+
+namespace: rabbitmq-cluster
+
+serviceType: NodePort
+httpNodePort: 31672
+amqpNodePort: 30672

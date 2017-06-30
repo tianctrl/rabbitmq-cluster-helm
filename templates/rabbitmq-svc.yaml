@@ -1,0 +1,26 @@
+kind: Service
+apiVersion: v1
+metadata:
+  namespace: {{ .Values.namespace }}
+  name: {{ template "fullname" . }}
+  labels:
+    app: {{ template "fullname" . }}
+spec:
+  type: {{ .Values.serviceType }}
+  ports:
+   - name: http
+     protocol: TCP
+     port: {{ .Values.rabbitmqManagerPort }}
+     targetPort: {{ .Values.rabbitmqManagerPort }}
+     {{- if eq .Values.serviceType "NodePort"}}
+     nodePort: {{ .Values.httpNodePort }}
+     {{- end}}
+   - name: amqp
+     protocol: TCP
+     port: {{ .Values.rabbitmqNodePort }}
+     targetPort: {{ .Values.rabbitmqNodePort }}
+     {{- if eq .Values.serviceType "NodePort"}}
+     nodePort: {{ .Values.amqpNodePort }}
+     {{- end}}
+  selector:
+    app: {{ template "fullname" . }}

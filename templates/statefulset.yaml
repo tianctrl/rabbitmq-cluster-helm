@@ -1,0 +1,59 @@
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  name: {{ template "fullname" . }}
+  namespace: {{ .Values.namespace }}
+spec:
+  serviceName: {{ template "fullname" . }}
+  replicas: {{ .Values.replicas }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "fullname" . }}
+    spec:
+      terminationGracePeriodSeconds: 10
+      {{- if .Values.serviceAccount }}
+      serviceAccountName: {{ .Values.serviceAccountName }}
+      {{- end }}
+      containers:        
+      - name: {{ template "fullname" . }}
+        image: "{{ .Values.image.name }}"
+        imagePullPolicy: "{{ .Values.image.pullPolicy }}"
+        ports:
+          - name: http
+            protocol: TCP
+            containerPort: {{ .Values.rabbitmqManagerPort }}
+          - name: amqp
+            protocol: TCP
+            containerPort: {{ .Values.rabbitmqNodePort }}
+        livenessProbe:
+          exec:
+            command: ["rabbitmqctl", "status"]
+          initialDelaySeconds: 30
+          timeoutSeconds: 5
+        readinessProbe:
+          exec:
+            command: ["rabbitmqctl", "status"]
+          initialDelaySeconds: 10
+          timeoutSeconds: 5
+        env:
+          - name: MY_POD_IP
+            valueFrom:
+              fieldRef:
+                fieldPath: status.podIP
+          - name: RABBITMQ_USE_LONGNAME
+            value: "true"
+          - name: RABBITMQ_NODENAME
+            value: "rabbit@$(MY_POD_IP)"
+          - name: AUTOCLUSTER_TYPE
+            value: "k8s"
+          - name: AUTOCLUSTER_DELAY
+            value: "10"
+          - name: K8S_ADDRESS_TYPE
+            value: "ip" 
+          - name: AUTOCLUSTER_CLEANUP
+            value: "true"
+          - name: CLEANUP_WARN_ONLY
+            value: "false"
+          - name: K8S_SERVICE_NAME
+            value: "{{ template "fullname" . }}"

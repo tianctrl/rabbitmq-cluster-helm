@@ -1,0 +1,15 @@
+
+**  RabbitMQ 集群 将会在几分钟之内进入可用状态. 请耐心等待. **
+
+RabbitMQ AMQP port 为 {{ default "5672" .Values.rabbitmqNodePort }}
+
+* 请在安装前先在对应的namespace下创建serviceaccount. *
+
+  echo kubectl -n (你的namespace) create serviceaccount rabbitmq
+  echo kubectl create clusterrolebinding rabbitmq --clusterrole cluster-admin --serviceaccount=(你的namespace):rabbitmq
+
+* 查看集群状态请使用. *
+
+  echo kubectl exec -n (你的namespace) (第一个pod的name) rabbitmqctl cluster_status
+
+
