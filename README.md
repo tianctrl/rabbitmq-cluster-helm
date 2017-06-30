@@ -1,16 +1,25 @@
 # RabbitMQ
 
-[RabbitMQ](https://www.rabbitmq.com/) 是一个在AMQP基础上完成的，可复用的企业消息系统。
+[RabbitMQ](https://www.rabbitmq.com/) 是一个在AMQP基础上完成的, 可复用的企业消息系统.
 
-## TL;DR;
+[RabbitMQ](https://www.rabbitmq.com/) is an open source message broker software that implements the Advanced Message Queuing Protocol (AMQP).
 
-```bash
-$ helm install stable/rabbitmq-cluster
-```
 
 ## 介绍
 
 该应用模板会使用 [Helm](https://helm.sh) 包管理工具在 [Kubernetes](http://kubernetes.io) 上启动一个 [RabbitMQ](https://github.com/bitnami/bitnami-docker-rabbitmq) 集群.
+
+设计集群的目的
+
+- 允许消费者和生产者在RabbitMQ节点崩溃的情况下继续运行
+- 通过增加更多的节点来扩展消息通信的吞吐量
+
+
+该集群默认启动3个节点, 1个master节点, 2个普通节点. 可根据需求扩容伸缩. 
+
+第一个启动的节点默认成为master节点.
+
+This cluster will create 1 master node, 2 slave nodes. The first one is master.
 
 ## 安装要求
 
@@ -21,63 +30,48 @@ $ helm install stable/rabbitmq-cluster
 
 请在对应的namespace下创建serviceAccount:
 
+Create a serviceaccount in your namespace.
+
 ```bash
 kubectl -n (你的namespace) create serviceaccount rabbitmq
 kubectl create clusterrolebinding rabbitmq --clusterrole cluster-admin --serviceaccount=(你的namespace):rabbitmq
 ```
 
-通过应用名来安装应用 `my-release`:
 
-```bash
-$ helm install --name my-release stable/rabbitmq-cluster
-```
-
-该命令会部署一个默认配置的RabbitMQ集群.  [configuration](#configuration) 配置目录列出了所有安装期间可使用的的参数.
-
-> **Tip**: 查看所有release请使用 helm list
-
-## 卸载应用
-
-卸载/删除 `my-release` :
-
-```bash
-$ helm delete my-release
-```
-
-该命令会移除所有与之相关的Kubernetes组件,并删除release.
-
-## 配置参数
+## 配置参数 Configuration
 
 下面的表格列出了RabbitMQ可配置的参数和参数的默认值.
 
+The table shows cluster default params.
+
 |         Parameter          |                       Description                       |                         Default                          |
 |----------------------------|---------------------------------------------------------|----------------------------------------------------------|
-| `image.name`               | RabbitMQ cluster image                                  | `bitnami/rabbitmq:{VERSION}`                             |
-| `image.pullPolicy`         | Image pull policy                                       | `Never`                                                  |
-| `replicas`                 | RabbitMQ application username                           | `3`                                                      |
-| `rabbitmqNodePort`         | Node port                                               | `5672`                                                   |
+| `image.name`               | RabbitMQ 集群镜像名                                      | `bitnami/rabbitmq:{VERSION}`                             |
+| `image.pullPolicy`         | 镜像拉取规则                                             | `Never`                                                  |
+| `replicas`                 | RabbitMQ 节点副本数                               | `3`                                                      |
+| `rabbitmqNodePort`         | RabbitMQ Node port                                      | `5672`                                                   |
 | `rabbitmqManagerPort`      | RabbitMQ Manager port                                   | `15672`                                                  |
-| `serviceAccount`           | serviceAccount                                          | `true`                                                   |
-| `serviceAccountName`       | serviceAccountName                                      | `rabbitmq`                                               |
-| `namespace`                | namespace                                               | `rabbitmq-cluster`                                       |
-| `serviceType`              | serviceType                                             | `NodePort`                                               |
-| `httpNodePort`             | httpNodePort                                            | `31672`                                                  |
-| `amqpNodePort`             | amqpNodePort                                            | `30672`                                                  |
+| `serviceAccount`           | serviceAccount(RBAC)                                    | `true`                                                   |
+| `serviceAccountName`       | serviceAccount名称                                      | `rabbitmq`                                               |
+| `namespace`                | Namespace(命名空间)                                               | `rabbitmq-cluster`                                       |
+| `serviceType`              | 服务类型(NodePort, ClusterIP等)                  | `NodePort`                                               |
+| `httpNodePort`             | Service NodePort端口号(http)                                            | `31672`                                                  |
+| `amqpNodePort`             | Service NodePort端口号(amqp)                                           | `30672`                                                  |
 
 
-使用 `--set key=value[,key=value]` 指定各个参数, 在 `helm install` 时使用. 例如,
 
-```bash
-$ helm install --name my-release \
-  --set namespace=rabbitmq,serviceAccountName=sarabbitmq \
-    stable/rabbitmq
+
+
+> **Tip**: 查看集群状态可使用:
+
+```
+kubectl exec -n (你的namespace) (第一个pod的name) rabbitmqctl cluster_status
 ```
 
-或者, 可以在安装阶段使用YAML文件来指定参数. 例如,
 
-```bash
-$ helm install --name my-release -f values.yaml stable/rabbitmq
+If you want to check the cluster status:
+
 ```
-
-> **Tip**: 你可以使用默认的 [values.yaml](values.yaml)
+kubectl exec -n (your namespace) (the first pod's name) rabbitmqctl cluster_status
+```
 

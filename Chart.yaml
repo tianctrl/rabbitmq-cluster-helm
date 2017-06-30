@@ -1,8 +1,11 @@
 description: RabbitMQ是一个在AMQP基础上完成的，可复用的企业消息系统。
 engine: gotpl
+home: https://www.rabbitmq.com
 icon: https://bitnami.com/assets/stacks/rabbitmq/img/rabbitmq-stack-220x234.png
 maintainers:
 - email: tianh@neunn.com
-  name: Tianh
+  name: www.neunn.com
 name: rabbitmq-cluster
+sources:
+- https://www.neunn.com
 version: 3.6.6
