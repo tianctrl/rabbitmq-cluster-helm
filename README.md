@@ -14,6 +14,7 @@
 - 允许消费者和生产者在RabbitMQ节点崩溃的情况下继续运行
 - 通过增加更多的节点来扩展消息通信的吞吐量
 
+This repo modified from [https://github.com/rabbitmq/rabbitmq-autocluster/tree/master/examples/k8s_statefulsets](https://github.com/rabbitmq/rabbitmq-autocluster/tree/master/examples/k8s_statefulsets)
 
 该集群默认启动3个节点, 1个master节点, 2个普通节点. 可根据需求扩容伸缩. 
 
