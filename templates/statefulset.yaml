@@ -2,7 +2,6 @@ apiVersion: apps/v1beta1
 kind: StatefulSet
 metadata:
   name: {{ template "fullname" . }}
-  namespace: {{ .Values.namespace }}
 spec:
   serviceName: {{ template "fullname" . }}
   replicas: {{ .Values.replicas }}
@@ -13,7 +12,7 @@ spec:
     spec:
       terminationGracePeriodSeconds: 10
       {{- if .Values.serviceAccount }}
-      serviceAccountName: {{ .Values.serviceAccountName }}
+      serviceAccountName: {{ template "fullname" . }}
       {{- end }}
       containers:        
       - name: {{ template "fullname" . }}
@@ -57,3 +56,30 @@ spec:
             value: "false"
           - name: K8S_SERVICE_NAME
             value: "{{ template "fullname" . }}"
+        {{- if .Values.storage.enabled }}
+        volumeMounts:
+          - mountPath: "/var/lib/rabbitmq"
+            name: rabbitmq-cluster-pv-storage
+        {{- end }}
+      - name: {{ template "fullname" . }}-exporter
+        image: {{ .Values.exporter.image }}
+        imagePullPolicy: {{ .Values.exporter.pullPolicy }}
+        ports:
+          - name: exporter
+            protocol: TCP
+            containerPort: {{ .Values.exporter.port }}
+        env:
+          - name: RABBIT_URL
+            value: "http://localhost:15672"
+          - name: PUBLISH_PORT
+            value: "9090"
+          - name: OUTPUT_FORMAT
+            value: "TTY"
+          - name: LOG_LEVEL
+            value: "info"
+      {{- if .Values.storage.enabled }}
+      volumes:
+        - name: rabbitmq-cluster-pv-storage
+          persistentVolumeClaim:
+            claimName: pvc-{{ template "fullname" . }}
+      {{- end }}

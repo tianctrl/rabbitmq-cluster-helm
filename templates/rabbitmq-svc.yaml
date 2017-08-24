@@ -1,7 +1,6 @@
 kind: Service
 apiVersion: v1
 metadata:
-  namespace: {{ .Values.namespace }}
   name: {{ template "fullname" . }}
   labels:
     app: {{ template "fullname" . }}
@@ -21,6 +20,13 @@ spec:
      targetPort: {{ .Values.rabbitmqNodePort }}
      {{- if eq .Values.serviceType "NodePort"}}
      nodePort: {{ .Values.amqpNodePort }}
+     {{- end}}
+   - name: exporter
+     protocol: TCP
+     port: {{ .Values.exporter.port }}
+     targetPort: {{ .Values.exporter.port }}
+     {{- if eq .Values.serviceType "NodePort"}}
+     nodePort: {{ .Values.exporterNodePort }}
      {{- end}}
   selector:
     app: {{ template "fullname" . }}

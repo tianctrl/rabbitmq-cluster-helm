@@ -1,0 +1,27 @@
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: pvc-{{ template "fullname" . }}
+  {{- if .Values.storage.isStorageClass }}
+  annotations:
+    {{- if .Values.storage.storageClass }}
+    volume.beta.kubernetes.io/storage-class: {{ .Values.storage.storageClass }}
+    {{- else }}
+    volume.alpha.kubernetes.io/storage-class: default
+    {{- end }}
+  {{- end }}
+spec:
+  accessModes:
+    - {{ .Values.storage.accessMode}}
+  resources:
+    requests:
+      storage: {{ .Values.storage.storageSpace }}
+  {{- if not .Values.storage.isStorageClass }}
+  selector:
+    matchLabels:
+    {{- if .Values.storage.pvSelector }}
+      app: {{ .Values.storage.pvSelector }}
+    {{- else }}
+      app: pv-{{ template "fullname" . }}
+    {{- end }}
+  {{- end }}

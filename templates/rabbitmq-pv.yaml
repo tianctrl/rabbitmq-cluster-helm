@@ -1,0 +1,14 @@
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: pv-{{ template "fullname" . }}
+  labels:
+    app: pv-{{ template "fullname" . }}
+    type: local
+spec:
+  capacity:
+    storage: {{ .Values.storage.storageSpace }}
+  accessModes:
+    - {{ .Values.storage.accessMode}}
+  hostPath:
+    path: "/tmp/data/master"

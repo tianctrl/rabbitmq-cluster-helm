@@ -2,8 +2,6 @@
 
 [RabbitMQ](https://www.rabbitmq.com/) 是一个在AMQP基础上完成的, 可复用的企业消息系统.
 
-[RabbitMQ](https://www.rabbitmq.com/) is an open source message broker software that implements the Advanced Message Queuing Protocol (AMQP).
-
 
 ## 介绍
 
@@ -14,13 +12,10 @@
 - 允许消费者和生产者在RabbitMQ节点崩溃的情况下继续运行
 - 通过增加更多的节点来扩展消息通信的吞吐量
 
-This repo modified from [https://github.com/rabbitmq/rabbitmq-autocluster/tree/master/examples/k8s_statefulsets](https://github.com/rabbitmq/rabbitmq-autocluster/tree/master/examples/k8s_statefulsets)
 
 该集群默认启动3个节点, 1个master节点, 2个普通节点. 可根据需求扩容伸缩. 
 
 第一个启动的节点默认成为master节点.
-
-This cluster will create 1 master node, 2 slave nodes. The first one is master.
 
 ## 安装要求
 
@@ -29,21 +24,32 @@ This cluster will create 1 master node, 2 slave nodes. The first one is master.
 
 ## 安装应用
 
-请在对应的namespace下创建serviceAccount:
+<!--请在对应的namespace下创建serviceAccount:  -->
 
-Create a serviceaccount in your namespace.
-
-```bash
+<!-- ```bash
 kubectl -n (你的namespace) create serviceaccount rabbitmq
 kubectl create clusterrolebinding rabbitmq --clusterrole cluster-admin --serviceaccount=(你的namespace):rabbitmq
+``` -->
+
+安装应用需要用户上传已准备好的json文件,文件示例如下:
+
+```
+{
+    "name": "rabbitmq-cluster-example",
+    "namespace": "rabbitmq-cluster",
+    "repo": "dcos",
+    "chart": "rabbitmq-cluster",
+    "version": "latest",
+    "values": {
+        
+    }  
+}
+
 ```
 
-
-## 配置参数 Configuration
+## 配置参数
 
 下面的表格列出了RabbitMQ可配置的参数和参数的默认值.
-
-The table shows cluster default params.
 
 |         Parameter          |                       Description                       |                         Default                          |
 |----------------------------|---------------------------------------------------------|----------------------------------------------------------|
@@ -54,12 +60,44 @@ The table shows cluster default params.
 | `rabbitmqManagerPort`      | RabbitMQ Manager port                                   | `15672`                                                  |
 | `serviceAccount`           | serviceAccount(RBAC)                                    | `true`                                                   |
 | `serviceAccountName`       | serviceAccount名称                                      | `rabbitmq`                                               |
-| `namespace`                | Namespace(命名空间)                                               | `rabbitmq-cluster`                                       |
 | `serviceType`              | 服务类型(NodePort, ClusterIP等)                  | `NodePort`                                               |
 | `httpNodePort`             | Service NodePort端口号(http)                                            | `31672`                                                  |
 | `amqpNodePort`             | Service NodePort端口号(amqp)                                           | `30672`                                                  |
+| `exporterNodePort`             | Service NodePort端口号(exporter)                                           | `32672`                                                  |
+| `storage.enabled`             | 是否开启外部存储                                 | `false`                                                  |
 
 
+
+如需修改上面参数,请参照( 以下为默认参数 ):
+
+```
+{
+    "name": "rabbitmq-cluster-example",
+    "namespace": "rabbitmq-cluster",
+    "repo": "dcos",
+    "chart": "rabbitmq-cluster",
+    "version": "latest",
+    "values": {
+        "image": {
+          "name": "neunnsy/rabbitmq-cluster",
+          "pullPolicy": "IfNotPresent"
+        },
+        "replicas": 3,
+        "rabbitmqNodePort": 5672,
+        "rabbitmqManagerPort": 15672,
+        "serviceAccount": true,
+        "serviceAccountName": "rabbitmq",
+        "serviceType": "NodePort",
+        "httpNodePort": 31672,
+        "amqpNodePort": 30672,
+        "exporterNodePort": 32672,
+        "storage": {
+            "enabled": false
+        }
+    }  
+}
+
+```
 
 
 
@@ -67,12 +105,5 @@ The table shows cluster default params.
 
 ```
 kubectl exec -n (你的namespace) (第一个pod的name) rabbitmqctl cluster_status
-```
-
-
-If you want to check the cluster status:
-
-```
-kubectl exec -n (your namespace) (the first pod's name) rabbitmqctl cluster_status
 ```
 

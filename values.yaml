@@ -20,8 +20,20 @@ rabbitmqManagerPort: 15672
 ## longName: true
 ## autoClusterType: k8s
 
-namespace: rabbitmq-cluster
-
 serviceType: NodePort
 httpNodePort: 31672
 amqpNodePort: 30672
+exporterNodePort: 32672
+
+exporter:
+  image: kbudde/rabbitmq-exporter
+  pullPolicy: IfNotPresent
+  port: 9090
+
+storage:
+  enabled: false
+  accessMode: ReadWriteOnce
+  isStorageClass: false
+  storageClass:
+  pvSelector:
+  storageSpace: 2Gi
