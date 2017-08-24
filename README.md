@@ -39,7 +39,7 @@ kubectl create clusterrolebinding rabbitmq --clusterrole cluster-admin --service
 |         Parameter          |                       Description                       |                         Default                          |
 |----------------------------|---------------------------------------------------------|----------------------------------------------------------|
 | `image.name`               | RabbitMQ 集群镜像名                                      | `bitnami/rabbitmq:{VERSION}`                             |
-| `image.pullPolicy`         | 镜像拉取规则                                             | `Never`                                                  |
+| `image.pullPolicy`         | 镜像拉取规则                                             | `IfNotPresent`                                                  |
 | `replicas`                 | RabbitMQ 节点副本数                               | `3`                                                      |
 | `rabbitmqNodePort`         | RabbitMQ Node port                                      | `5672`                                                   |
 | `rabbitmqManagerPort`      | RabbitMQ Manager port                                   | `15672`                                                  |
