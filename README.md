@@ -31,21 +31,6 @@ kubectl -n (你的namespace) create serviceaccount rabbitmq
 kubectl create clusterrolebinding rabbitmq --clusterrole cluster-admin --serviceaccount=(你的namespace):rabbitmq
 ``` -->
 
-安装应用需要用户上传已准备好的json文件,文件示例如下:
-
-```
-{
-    "name": "rabbitmq-cluster-example",
-    "namespace": "rabbitmq-cluster",
-    "repo": "dcos",
-    "chart": "rabbitmq-cluster",
-    "version": "latest",
-    "values": {
-        
-    }  
-}
-
-```
 
 ## 配置参数
 
@@ -63,8 +48,8 @@ kubectl create clusterrolebinding rabbitmq --clusterrole cluster-admin --service
 | `serviceType`              | 服务类型(NodePort, ClusterIP等)                  | `NodePort`                                               |
 | `httpNodePort`             | Service NodePort端口号(http)                                            | `31672`                                                  |
 | `amqpNodePort`             | Service NodePort端口号(amqp)                                           | `30672`                                                  |
-| `exporterNodePort`             | Service NodePort端口号(exporter)                                           | `32672`                                                  |
-| `storage.enabled`             | 是否开启外部存储                                 | `false`                                                  |
+| `storage.enabled`             | 是否开启外部存储                                 | `false`         |
+| `metrics.enabled`             | 是否开启标量支持                                 | `false`         |
 
 
 
@@ -93,6 +78,9 @@ kubectl create clusterrolebinding rabbitmq --clusterrole cluster-admin --service
         "exporterNodePort": 32672,
         "storage": {
             "enabled": false
+        },
+        "metrics": {
+            "enabled": false
         }
     }  
 }
@@ -106,4 +94,5 @@ kubectl create clusterrolebinding rabbitmq --clusterrole cluster-admin --service
 ```
 kubectl exec -n (你的namespace) (第一个pod的name) rabbitmqctl cluster_status
 ```
+
 
